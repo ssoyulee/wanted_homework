@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  wanted:
+    container_name: wanted
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ../sources:/data01/source
+      - ../file:/data01/file
+    ports:
+      - '5000:5000'
+  postgres:
+          #    image: postgres:10
+    container_name: postgres
+    build:
+      context: .
+      dockerfile: ./Dockerfile_DB
+      #    environment:
+      #- POSTGRES_USER=postgres 
+      #- POSTGRES_PASSWORD=postgres 
+      #- POSTGRES_DBNAME=testdb 
+      #- ALLOW_IP_RANGE=0.0.0.0/0
+    volumes:
+      - ../file/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
+    ports:
+      - '5432:5432'
+
