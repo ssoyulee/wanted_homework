@@ -1,2 +1,6 @@
 flask
-sqlalchemy 
+flask_restx
+flask_sqlalchemy
+sqlalchemy
+configparser 
+psycopg2

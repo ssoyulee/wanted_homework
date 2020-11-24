@@ -5,6 +5,7 @@ FROM python:3
 ###########################
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y vim
+RUN apt-get install -y ssh
 RUN ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 ## pip update
@@ -15,4 +16,5 @@ WORKDIR /data01/source
 #RUN cp -r /data01/source/ssg-item-sync/* /workspace/ssg-item-sync
 #CMD sh deploy.sh
 
-CMD tail -f /dev/null
+CMD sh start.sh
+#CMD tail -f /dev/null
