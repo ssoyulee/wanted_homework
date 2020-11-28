@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_restx import Api, Namespace, reqparse, Resource, fields
 from models import db
 import configparser
-from db import init_datebase, select_company_tag, select_company, update_company_tag, delete_company_tag
+from repository import init_datebase, select_company_tag, select_company, update_company_tag, delete_company_tag
 
 app = Flask(__name__)
 
@@ -26,6 +26,15 @@ api = Api(app, title='wanted api', description='wanted api homework', doc='/want
 init_api = Namespace('wanted init', path='/init', description='init api')
 #api.add_namespace(init_api)
 
+
+search_init_api = Namespace('wanted init db', path='/init', description='db init api')
+
+api.add_namespace(search_init_api)
+
+search_all_company_api = Namespace('wanted search_company', path='/search_all_company', description='search_all_company api')
+
+api.add_namespace(search_all_company_api)
+
 search_company_api = Namespace('wanted search_company', path='/search_company', description='search_company api')
 search_company_parser = reqparse.RequestParser()
 search_company_parser.add_argument('search_word', type=str, default='', help='검색 조건')
@@ -39,7 +48,7 @@ search_tag_parser.add_argument('search_word', type=str, default='', help='검색
 api.add_namespace(search_tag_api)
 
 update_tag_api = Namespace('wanted update_tag', path='/update_tag', description='update_tag api')
-update_tag_model = update_tag_api.model('tag',{
+update_tag_model = update_tag_api.model('update_tag',{
     'update_tag_lang': fields.String(description='ko|en|ja', required=True, example="ko"),
     'update_tag': fields.String(description='수정할 태그명', required=True, example="TAG_A")
 })
@@ -47,7 +56,7 @@ update_tag_model = update_tag_api.model('tag',{
 api.add_namespace(update_tag_api)
 
 delete_tag_api = Namespace('wanted delete_tag', path='/delete_tag', description='delete_tag api')
-delete_tag_model = delete_tag_api.model('tag',{
+delete_tag_model = delete_tag_api.model('delete_tag',{
     'delete_tag_lang': fields.String(description='삭제할 태그 lang(ko|en|ja)', required=True, example="ko")
 })
 
@@ -71,10 +80,49 @@ list_result_model = api.model('result_list',{
 ''' api 설정 '''
 
 
-@app.route('/init', methods=['GET'])
-def init() :
-    init_datebase()
-    return '<h1>hello world<h1>'
+@search_init_api.route('', methods=['GET'])
+class InitDatabase(Resource) :
+    @search_init_api.response(200, 'Success',list_result_model)
+    @search_init_api.response(400, 'Bad Request')
+    
+    def get(self) :
+        
+        response = {}
+        try :
+            init_datebase()
+            result_list = select_company(search_word='')
+
+            response['result_cd'] = '00'
+            response['result_msg'] = 'SUCCESS'
+            response['result_list'] = result_list
+
+        except Exception as e :
+            response['result_cd'] = '99'
+            response['result_msg'] = '데이터가 이미 들어가 있습니다.'
+
+        return response
+
+@search_all_company_api.route('',methods=['GET'])
+class SearchAllCompany(Resource) :
+    ''' 회사를 검색하는 API ''' 
+    @search_all_company_api.response(200, 'Success',list_result_model)
+    @search_all_company_api.response(400, 'Bad Request')
+    
+    def get(self) :
+
+        response = {}
+        try :
+            result_list = select_company(search_word='')
+
+            response['result_cd'] = '00'
+            response['result_msg'] = 'SUCCESS'
+            response['result_list'] = result_list
+
+        except Exception as e :
+            response['result_cd'] = '99'
+            response['result_msg'] = str(e)
+
+        return response
 
 @search_company_api.route('',methods=['GET'])
 class SearchCompany(Resource) :
@@ -96,7 +144,7 @@ class SearchCompany(Resource) :
 
         except Exception as e :
             response['result_cd'] = '99'
-            response['result_msg'] = e
+            response['result_msg'] = str(e)
 
         return response
 
@@ -120,7 +168,7 @@ class SearchTag(Resource) :
 
         except Exception as e :
             response['result_cd'] = '99'
-            response['result_msg'] = e
+            response['result_msg'] = str(e)
 
         return response
 
@@ -150,7 +198,7 @@ class UpdateTag(Resource) :
 
         except Exception as e :
             response['result_cd'] = '99'
-            response['result_msg'] = e
+            response['result_msg'] = str(e)
 
         return response
 
@@ -176,7 +224,7 @@ class DeleteTag(Resource) :
 
         except Exception as e :
             response['result_cd'] = '99'
-            response['result_msg'] = e
+            response['result_msg'] = str(e)
 
         return response
 

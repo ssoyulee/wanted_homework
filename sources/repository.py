@@ -47,9 +47,11 @@ def select_company_info(list_company) :
         response.append(result)
 
     return response
-    
+
 def select_company(search_word) :
     ''' 회사를 검색한다. '''
+    if search_word is None :
+        search_word = ''
     list_company = db.session.query(CompanyLang.company_id.distinct())\
                     .filter(CompanyLang.company_lang_name.like('%' + search_word + '%'))
 
@@ -57,6 +59,8 @@ def select_company(search_word) :
 
 def select_company_tag(search_word) :
     ''' 회사 태그를 검색한다. '''
+    if search_word is None :
+        search_word = ''
     list_company = db.session.query(CompanyLang.company_id.distinct())\
                     .filter(CompanyLang.company_lang_tag.like('%' + search_word + '%'))
 
