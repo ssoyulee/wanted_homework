@@ -14,6 +14,14 @@ wanted_homework
 ```
 
 ## 접속 방법
+### Port 
+'''
+기본 포트 : 80
+포트 변경이 필요할 경우
+wanted_homework/docker/docker-compose.yml 파일 내 포트를 수정하시면 됩니다.
+- '80:5000'
+'''
+
 ### DB Data init
 ```
 http://{host}/init
@@ -23,3 +31,4 @@ http://{host}/init
 ```
 http://{host}/wanted/doc
 ```
+
