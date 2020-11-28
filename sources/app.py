@@ -26,42 +26,42 @@ api = Api(app, title='wanted api', description='wanted api homework', doc='/want
 init_api = Namespace('wanted init', path='/init', description='init api')
 #api.add_namespace(init_api)
 
-
-search_init_api = Namespace('wanted init db', path='/init', description='db init api')
-
+''' 데이터 초기화 '''
+search_init_api = Namespace('wanted init db', path='/init', description='DB에 데이터를 입력한다.')
 api.add_namespace(search_init_api)
 
-search_all_company_api = Namespace('wanted search_company', path='/search_all_company', description='search_all_company api')
-
+''' 전체 업체 조회 '''
+search_all_company_api = Namespace('wanted search_company', path='/search_all_company', description='전체 업체를 조회한다.')
 api.add_namespace(search_all_company_api)
 
-search_company_api = Namespace('wanted search_company', path='/search_company', description='search_company api')
+''' 업체명 조회 '''
+search_company_api = Namespace('wanted search_company', path='/search_company', description='업체명으로 업체를 조회한다.')
 search_company_parser = reqparse.RequestParser()
-search_company_parser.add_argument('search_word', type=str, default='', help='검색 조건')
-
+search_company_parser.add_argument('search_word', type=str, default='원티드', help='검색 조건')
 api.add_namespace(search_company_api)
 
-search_tag_api = Namespace('wanted search_tag', path='/search_tag', description='search_tag api')
+''' 태그 조회 '''
+search_tag_api = Namespace('wanted search_tag', path='/search_tag', description='태그명으로 업체를 조회한다.')
 search_tag_parser = reqparse.RequestParser()
-search_tag_parser.add_argument('search_word', type=str, default='', help='검색 조건')
-
+search_tag_parser.add_argument('search_word', type=str, default='tag', help='검색 조건')
 api.add_namespace(search_tag_api)
 
-update_tag_api = Namespace('wanted update_tag', path='/update_tag', description='update_tag api')
+''' 태그 수정 '''
+update_tag_api = Namespace('wanted update_tag', path='/update_tag', description='업체의 태그명을 변경한다.')
 update_tag_model = update_tag_api.model('update_tag',{
     'update_tag_lang': fields.String(description='ko|en|ja', required=True, example="ko"),
     'update_tag': fields.String(description='수정할 태그명', required=True, example="TAG_A")
 })
-
 api.add_namespace(update_tag_api)
 
-delete_tag_api = Namespace('wanted delete_tag', path='/delete_tag', description='delete_tag api')
+''' 태그 삭제 '''
+delete_tag_api = Namespace('wanted delete_tag', path='/delete_tag', description='업체의 태그명을 삭제한다.(언어단위)')
 delete_tag_model = delete_tag_api.model('delete_tag',{
     'delete_tag_lang': fields.String(description='삭제할 태그 lang(ko|en|ja)', required=True, example="ko")
 })
-
 api.add_namespace(delete_tag_api)
 
+''' 요청 결과 모델 '''
 result_model = api.model('result',{
     'company_id': fields.String(description='ID', required=True, example="1"),
     'company_ko': fields.String(description='회사명(한국어)', required=True, example="원티드"),
@@ -82,6 +82,7 @@ list_result_model = api.model('result_list',{
 
 @search_init_api.route('', methods=['GET'])
 class InitDatabase(Resource) :
+    ''' 데이터 초기화 API '''
     @search_init_api.response(200, 'Success',list_result_model)
     @search_init_api.response(400, 'Bad Request')
     
@@ -104,12 +105,12 @@ class InitDatabase(Resource) :
 
 @search_all_company_api.route('',methods=['GET'])
 class SearchAllCompany(Resource) :
-    ''' 회사를 검색하는 API ''' 
+    ''' 전체 회사를 검색하는 API ''' 
     @search_all_company_api.response(200, 'Success',list_result_model)
     @search_all_company_api.response(400, 'Bad Request')
     
     def get(self) :
-
+        
         response = {}
         try :
             result_list = select_company(search_word='')
@@ -132,7 +133,7 @@ class SearchCompany(Resource) :
     @search_company_api.response(400, 'Bad Request')
     
     def get(self) :
-
+        
         response = {}
         try :
             search_word = request.args.get('search_word')
@@ -156,7 +157,7 @@ class SearchTag(Resource) :
     @search_tag_api.response(400, 'Bad Request')
     
     def get(self) :
-
+        
         response = {}
         try :
             search_word = request.args.get('search_word')
@@ -185,7 +186,6 @@ class UpdateTag(Resource) :
         
         response = {}
         try :
-
             body = request.get_json()
             update_tag_lang = body['update_tag_lang']
             update_tag = body['update_tag']
@@ -230,3 +230,4 @@ class DeleteTag(Resource) :
 
 if __name__ == '__main__' :
     app.run(host='0.0.0.0', port='5000', debug=True)
+

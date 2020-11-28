@@ -164,4 +164,3 @@ if __name__ == '__main__' :
     result = connect.execute(text('select 1'))
     print(result.rowcount)
 
-    init_datebase()
