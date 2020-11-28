@@ -159,6 +159,7 @@ class UpdateTag(Resource) :
 @delete_tag_api.doc(params={'company_tag_lang': 'company_tag_lang'})
 class DeleteTag(Resource) :
     ''' 태그를 삭제하는 API ''' 
+    @delete_tag_api.expect(delete_tag_model)
     @delete_tag_api.response(200, 'Success')
     @delete_tag_api.response(400, 'Bad Request')
     
